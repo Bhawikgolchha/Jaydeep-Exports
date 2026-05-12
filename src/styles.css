@@ -1,5 +1,6 @@
 /* ====================================================================
-   Jaydeep Exports — Editorial redesign
+   Jaydeep Exports — Editorial redesign (v2: now with hero photo wash)
+   Generated from the design bundle. Edit src/styles.css directly.
    ==================================================================== */
 
 :root {
@@ -165,6 +166,53 @@ button { font: inherit; background: none; border: 0; cursor: pointer; color: inh
   overflow: hidden;
   background: var(--paper);
 }
+/* ---- In-the-wild hero photos: slow crossfade behind the jali ---- */
+.hero-photos {
+  position: absolute; inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+  background: var(--paper-deep);
+}
+.hero-photos img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  /* warm desaturated wash so photos read as atmosphere, not foreground */
+  filter: sepia(.28) saturate(.78) brightness(.62) contrast(.95);
+  animation: heroPhotoCycle 27s cubic-bezier(.45,.05,.55,1) infinite;
+  will-change: opacity, transform;
+}
+.hero-photos img:nth-child(1) { animation-delay:  0s; }
+.hero-photos img:nth-child(2) { animation-delay:  9s; }
+.hero-photos img:nth-child(3) { animation-delay: 18s; }
+@keyframes heroPhotoCycle {
+  /* visible 0–33%, fade 30–37%, hidden 37–100%, prime back at 96–100% */
+  0%   { opacity: 0; transform: scale(1.08) translate3d(0, 0, 0); }
+  11%  { opacity: .55; }
+  22%  { opacity: .55; transform: scale(1.14) translate3d(-1.2%, -.6%, 0); }
+  33%  { opacity: 0;   transform: scale(1.16) translate3d(-1.4%, -.8%, 0); }
+  100% { opacity: 0;   transform: scale(1.08); }
+}
+/* Warm vignette over the photo wash, both to deepen mood and to harmonise jali */
+.hero-photos::after {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 90% 80% at 50% 45%,
+      transparent 0%,
+      color-mix(in oklab, var(--paper-dark) 60%, transparent) 80%,
+      var(--paper-dark) 100%),
+    linear-gradient(180deg,
+      color-mix(in oklab, var(--paper) 70%, transparent) 0%,
+      transparent 25%,
+      transparent 70%,
+      var(--paper) 100%);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
 .hero-canvas {
   position: absolute; inset: 0;
   display: grid;
@@ -172,12 +220,14 @@ button { font: inherit; background: none; border: 0; cursor: pointer; color: inh
   grid-auto-rows: 1fr;
   gap: 0;
   pointer-events: none;
+  z-index: 1;
 }
 .jali-cell {
   position: relative;
   aspect-ratio: 1;
-  background: var(--paper-deep);
-  border: 1px solid var(--rule-soft);
+  /* transparent so the in-the-wild photos can breathe through the lattice */
+  background: color-mix(in oklab, var(--paper) 22%, transparent);
+  border: 1px solid color-mix(in oklab, var(--paper) 30%, transparent);
   opacity: 0;
   transform: scale(.4) rotate(-8deg);
   animation: cellIn .9s var(--e-out) forwards;
@@ -808,44 +858,6 @@ section { padding: 100px var(--gutter); }
   font-family: var(--sans); font-size: 15px; font-weight: 400;
   line-height: 1.55; color: oklch(0.82 0.012 50);
 }
-.contact-list .v.addr a {
-  display: inline-block;
-  color: inherit;
-  text-decoration: none;
-  border-bottom: 1px dashed oklch(0.55 0.012 50 / .35);
-  padding-bottom: 4px;
-  transition: color .2s ease, border-color .2s ease;
-}
-.contact-list .v.addr a:hover {
-  color: var(--paper);
-  border-bottom-color: oklch(0.72 0.135 35);
-}
-.contact-list .v.addr .addr-cue {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  margin-top: 10px;
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: oklch(0.72 0.135 35);
-  border-bottom: 0;
-  padding: 0;
-}
-.contact-list .v.addr a:hover .addr-cue {
-  color: oklch(0.85 0.135 35);
-}
-.contact-list .v.addr .addr-cue svg {
-  width: 13px; height: 13px;
-  fill: none;
-  stroke: currentColor;
-  margin: 0;
-  transition: transform .2s ease;
-}
-.contact-list .v.addr a:hover .addr-cue svg {
-  transform: translateX(3px);
-}
 
 .contact-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
 .contact-cta .btn-ghost { color: var(--paper); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--paper) 40%, transparent); }
@@ -912,4 +924,44 @@ section { padding: 100px var(--gutter); }
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
   .reveal { opacity: 1; transform: none; }
   .line-mask > span { transform: none; }
+}
+
+/* ============================ Maps link on the address ============================ */
+.contact-list .v.addr a {
+  display: inline-block;
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px dashed oklch(0.55 0.012 50 / .35);
+  padding-bottom: 4px;
+  transition: color .2s ease, border-color .2s ease;
+}
+.contact-list .v.addr a:hover {
+  color: var(--paper);
+  border-bottom-color: oklch(0.72 0.135 35);
+}
+.contact-list .v.addr .addr-cue {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 10px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: oklch(0.72 0.135 35);
+  border-bottom: 0;
+  padding: 0;
+}
+.contact-list .v.addr a:hover .addr-cue {
+  color: oklch(0.85 0.135 35);
+}
+.contact-list .v.addr .addr-cue svg {
+  width: 13px; height: 13px;
+  fill: none;
+  stroke: currentColor;
+  margin: 0;
+  transition: transform .2s ease;
+}
+.contact-list .v.addr a:hover .addr-cue svg {
+  transform: translateX(3px);
 }
