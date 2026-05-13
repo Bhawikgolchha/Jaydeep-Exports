@@ -160,11 +160,16 @@ button { font: inherit; background: none; border: 0; cursor: pointer; color: inh
 /* ============================ HERO ============================ */
 .hero {
   position: relative;
-  min-height: 100svh;
+  /* Plain vh on mobile so the address bar showing/hiding doesn't reflow the
+     hero mid-scroll (was 100svh — that's what caused the "glitching"). */
+  min-height: 100vh;
   padding: 120px var(--gutter) 100px;
   display: flex; flex-direction: column; justify-content: flex-end;
   overflow: hidden;
   background: var(--paper);
+}
+@media (min-width: 880px) {
+  .hero { min-height: 100svh; }
 }
 /* ---- In-the-wild hero photos: slow crossfade behind the jali ---- */
 .hero-photos {
@@ -181,8 +186,24 @@ button { font: inherit; background: none; border: 0; cursor: pointer; color: inh
   opacity: 0;
   /* warm desaturated wash so photos read as atmosphere, not foreground */
   filter: sepia(.28) saturate(.78) brightness(.62) contrast(.95);
-  animation: heroPhotoCycle 27s cubic-bezier(.45,.05,.55,1) infinite;
-  will-change: opacity, transform;
+  /* Mobile: opacity-only fade (no transforms) so the address bar
+     toggling doesn't fight a scale/translate keyframe mid-frame. */
+  animation: heroPhotoFade 27s cubic-bezier(.45,.05,.55,1) infinite;
+  will-change: opacity;
+  transform: translateZ(0);
+}
+@media (min-width: 880px) {
+  .hero-photos img {
+    animation-name: heroPhotoCycle;
+    will-change: opacity, transform;
+  }
+}
+@keyframes heroPhotoFade {
+  0%   { opacity: 0; }
+  11%  { opacity: .55; }
+  22%  { opacity: .55; }
+  33%  { opacity: 0; }
+  100% { opacity: 0; }
 }
 .hero-photos img:nth-child(1) { animation-delay:  0s; }
 .hero-photos img:nth-child(2) { animation-delay:  9s; }
@@ -345,8 +366,13 @@ button { font: inherit; background: none; border: 0; cursor: pointer; color: inh
 }
 .marquee-track {
   display: flex; gap: 48px; white-space: nowrap;
-  animation: scroll 38s linear infinite;
+  /* Slow on mobile — a 38s loop visually whips by on a narrow viewport
+     because each pixel is a bigger fraction of the screen. */
+  animation: scroll 75s linear infinite;
   width: max-content;
+}
+@media (min-width: 880px) {
+  .marquee-track { animation-duration: 38s; }
 }
 .marquee-track span {
   font-family: var(--serif); font-style: italic;
