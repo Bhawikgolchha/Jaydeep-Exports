@@ -56,8 +56,15 @@ button { font: inherit; background: none; border: 0; cursor: pointer; color: inh
 .reveal-delay-4 { transition-delay: .32s; }
 
 .line-mask { display: inline-block; overflow: hidden; vertical-align: bottom; }
-.line-mask > span { display: inline-block; transform: translateY(110%); transition: transform 1s var(--e-out); }
-.line-mask.in > span { transform: none; }
+/* Default: text is VISIBLE. The slide-in animation only opts in on desktop
+   where we can trust the JS timing. On mobile the line-mask spans were
+   stuck at translateY(110%) when the setTimeout/IO didn't fire in time —
+   leaving the entire H1 invisible. */
+.line-mask > span { display: inline-block; }
+@media (min-width: 880px) {
+  .line-mask > span { transform: translateY(110%); transition: transform 1s var(--e-out); }
+  .line-mask.in > span { transform: none; }
+}
 
 /* ============================ Top bar ============================ */
 .topbar {
