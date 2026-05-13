@@ -49,28 +49,36 @@
   }
   buildJali();
   let resizeT;
+  let lastW = window.innerWidth;
   window.addEventListener('resize', () => {
+    // Mobile URL-bar show/hide fires resize with only a height delta — ignore
+    // those, otherwise the jali rebuilds mid-scroll and the hero "glitches".
+    if (window.innerWidth === lastW) return;
+    lastW = window.innerWidth;
     clearTimeout(resizeT);
     resizeT = setTimeout(buildJali, 250);
   });
 
-  /* ============== Parallax on hero ============== */
+  /* ============== Parallax on hero (desktop only) ============== */
   const heroInner = document.querySelector('.hero-inner');
+  const isCoarse = window.matchMedia('(hover: none), (pointer: coarse), (max-width: 879px)').matches;
   let ticking = false;
-  window.addEventListener('scroll', () => {
-    if (!ticking) {
-      requestAnimationFrame(() => {
-        const y = window.scrollY;
-        if (y < window.innerHeight) {
-          heroCanvas.style.transform = `translateY(${y * 0.35}px)`;
-          if (heroInner) heroInner.style.transform = `translateY(${y * -0.12}px)`;
-          heroInner.style.opacity = String(Math.max(0, 1 - y / (window.innerHeight * 0.85)));
-        }
-        ticking = false;
-      });
-      ticking = true;
-    }
-  }, { passive: true });
+  if (!isCoarse) {
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const y = window.scrollY;
+          if (y < window.innerHeight) {
+            heroCanvas.style.transform = `translateY(${y * 0.18}px)`;
+            if (heroInner) heroInner.style.transform = `translateY(${y * -0.06}px)`;
+            heroInner.style.opacity = String(Math.max(0, 1 - y / (window.innerHeight * 1.1)));
+          }
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }, { passive: true });
+  }
 
   /* ============== Topbar scroll state ============== */
   const topbar = document.getElementById('topbar');
